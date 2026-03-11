@@ -34,7 +34,8 @@ public class addCommand implements Command {
     public void execute (String[] args, Scheduler scheduler) {
 
         if (args.length < 2) {
-            throw new IllegalArgumentException("not enough arguments"); // to do
+            System.out.println("Look up manual \"help\"");
+            return;
         }
 
         List<StringBuilder> parts = new ArrayList<>();
@@ -51,7 +52,8 @@ public class addCommand implements Command {
         }
 
         if (parts.size() < 3) {
-            throw new IllegalArgumentException("minimum 3 arguments");
+            System.out.println("Look up manual \"help\"");
+            return;
         }
         String value = parts.get(2).toString();
         int seconds = Integer.parseInt(value.replaceAll("\\D", ""));

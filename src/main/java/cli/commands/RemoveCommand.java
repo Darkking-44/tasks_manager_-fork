@@ -37,7 +37,7 @@ public class RemoveCommand implements Command {
     public void execute(String[] args, Scheduler scheduler) {
         StringBuilder name = new StringBuilder();
         if (args.length < 3) {
-            System.out.println("help"); //to do
+            System.out.println("Look up manual \"help\"");
             return;
         }
         for(int i = 2; i < args.length; i++) {

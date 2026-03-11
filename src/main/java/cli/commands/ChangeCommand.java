@@ -36,14 +36,13 @@ public class changeCommand implements Command {
      */
     public void execute(String[] args, Scheduler scheduler) {
         if (args.length < 4) {
-            System.out.println("help");
+            System.out.println("Look up manual \"help\"");
             return;
         }
         switch (args[1]) {
             case "--Name" -> scheduler.changeName(UUID.fromString(args[2]), args[3]);
             case "--Priority" -> scheduler.changePriority(UUID.fromString(args[2]), Integer.parseInt(args[3]));
             //case "--ExecuteAt" -> scheduler.changeExecuteAt(UUID.fromString(args[2]), args[3]); to do
-            default -> throw new IllegalStateException("Unexpected value: " + args[1]);
         }
     }
 }

@@ -38,7 +38,7 @@ public class SortCommand implements Command {
 
     public void execute(String[] args, Scheduler scheduler) {
         if (args.length < 2) {
-            System.out.println("help");
+            System.out.println("Look up manual \"help\"");
         }
         switch(args[1]) {
             case "--byName" -> scheduler.sortByName();
