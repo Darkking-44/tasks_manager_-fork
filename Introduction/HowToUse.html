@@ -1,0 +1,1473 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tasks Manager — Dokumentation</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0f0f11;
+    --bg1: #161618;
+    --bg2: #1e1e21;
+    --bg3: #26262a;
+    --border: #2e2e33;
+    --border2: #3a3a40;
+    --text: #f0eff4;
+    --text2: #a8a7b5;
+    --text3: #6b6a7a;
+    --accent: #cc785c;
+    --accent2: #e8956d;
+    --accent-dim: rgba(204, 120, 92, 0.12);
+    --green: #6cbf8a;
+    --green-dim: rgba(108, 191, 138, 0.12);
+    --blue: #7aadcf;
+    --blue-dim: rgba(122, 173, 207, 0.12);
+    --yellow: #d4a853;
+    --yellow-dim: rgba(212, 168, 83, 0.12);
+    --red: #c96464;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    font-size: 15px;
+    overflow-x: hidden;
+  }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    position: fixed;
+    left: 0; top: 0;
+    width: 240px;
+    height: 100vh;
+    background: var(--bg1);
+    border-right: 1px solid var(--border);
+    padding: 32px 0;
+    overflow-y: auto;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .sidebar-brand {
+    padding: 0 24px 28px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 20px;
+  }
+
+  .sidebar-brand .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 6px;
+  }
+
+  .logo-icon {
+    width: 30px; height: 30px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+  }
+
+  .sidebar-brand h1 {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: 0.01em;
+  }
+
+  .sidebar-brand .version {
+    font-size: 11px;
+    color: var(--text3);
+    font-family: 'DM Mono', monospace;
+    padding: 2px 8px;
+    background: var(--bg2);
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    display: inline-block;
+  }
+
+  .nav-section {
+    padding: 0 12px;
+    margin-bottom: 8px;
+  }
+
+  .nav-section-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text3);
+    padding: 0 12px;
+    margin-bottom: 4px;
+  }
+
+  .nav-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 12px;
+    border-radius: 6px;
+    color: var(--text2);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 400;
+    transition: all 0.15s;
+    cursor: pointer;
+  }
+
+  .nav-link:hover {
+    background: var(--bg2);
+    color: var(--text);
+  }
+
+  .nav-link.active {
+    background: var(--accent-dim);
+    color: var(--accent2);
+  }
+
+  .nav-link .nav-icon {
+    font-size: 12px;
+    width: 16px;
+    text-align: center;
+    opacity: 0.7;
+  }
+
+  /* ── MAIN ── */
+  .main {
+    margin-left: 240px;
+    min-height: 100vh;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    padding: 80px 80px 60px;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(160deg, var(--bg1) 0%, var(--bg) 60%);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -100px; right: -100px;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(204,120,92,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    background: var(--accent-dim);
+    border: 1px solid rgba(204,120,92,0.2);
+    border-radius: 20px;
+    padding: 4px 12px;
+    margin-bottom: 24px;
+  }
+
+  .hero h1 {
+    font-family: 'Instrument Serif', serif;
+    font-size: 52px;
+    line-height: 1.1;
+    font-weight: 400;
+    margin-bottom: 16px;
+    letter-spacing: -0.02em;
+  }
+
+  .hero h1 em {
+    font-style: italic;
+    color: var(--accent2);
+  }
+
+  .hero .subtitle {
+    font-size: 17px;
+    color: var(--text2);
+    max-width: 540px;
+    line-height: 1.6;
+    margin-bottom: 36px;
+    font-weight: 300;
+  }
+
+  .hero-meta {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+
+  .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--text3);
+  }
+
+  .meta-item .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--green);
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  /* ── CONTENT ── */
+  .content {
+    padding: 60px 80px;
+    max-width: 900px;
+  }
+
+  /* ── SECTIONS ── */
+  .section {
+    margin-bottom: 72px;
+    scroll-margin-top: 32px;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 28px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    background: var(--accent-dim);
+    width: 28px; height: 28px;
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    border: 1px solid rgba(204,120,92,0.2);
+    flex-shrink: 0;
+  }
+
+  .section h2 {
+    font-family: 'Instrument Serif', serif;
+    font-size: 28px;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+  }
+
+  .section p {
+    color: var(--text2);
+    margin-bottom: 16px;
+    line-height: 1.75;
+  }
+
+  /* ── OVERVIEW CARDS ── */
+  .overview-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+
+  .overview-card {
+    background: var(--bg1);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    transition: border-color 0.2s;
+  }
+
+  .overview-card:hover { border-color: var(--border2); }
+
+  .overview-card .card-icon {
+    font-size: 20px;
+    margin-bottom: 10px;
+  }
+
+  .overview-card h3 {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: var(--text);
+  }
+
+  .overview-card p {
+    font-size: 13px;
+    color: var(--text3);
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  /* ── ARCHITECTURE ── */
+  .arch-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .arch-pkg {
+    background: var(--bg1);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+  }
+
+  .arch-pkg .pkg-name {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+
+  .arch-pkg .pkg-files {
+    list-style: none;
+  }
+
+  .arch-pkg .pkg-files li {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--text3);
+    padding: 3px 0;
+    border-bottom: 1px solid var(--bg3);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .arch-pkg .pkg-files li:last-child { border: none; }
+
+  .arch-pkg .pkg-files li::before {
+    content: '';
+    width: 4px; height: 4px;
+    border-radius: 50%;
+    background: var(--border2);
+    flex-shrink: 0;
+  }
+
+  /* ── CODE BLOCKS ── */
+  .code-block {
+    background: var(--bg1);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin: 20px 0;
+    font-family: 'DM Mono', monospace;
+  }
+
+  .code-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .code-header .code-lang {
+    font-size: 11px;
+    color: var(--text3);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .code-header .code-label {
+    font-size: 11px;
+    color: var(--text3);
+  }
+
+  .code-body {
+    padding: 20px;
+    overflow-x: auto;
+  }
+
+  .code-body code {
+    font-size: 13px;
+    line-height: 1.8;
+    display: block;
+    white-space: pre;
+  }
+
+  .c-prompt { color: var(--accent2); }
+  .c-cmd { color: #7aadcf; }
+  .c-flag { color: var(--green); }
+  .c-arg { color: var(--yellow); }
+  .c-comment { color: var(--text3); font-style: italic; }
+  .c-output { color: var(--text3); }
+  .c-keyword { color: #c678dd; }
+  .c-string { color: var(--green); }
+  .c-class { color: var(--yellow); }
+  .c-num { color: var(--accent2); }
+
+  /* ── COMMAND CARDS ── */
+  .cmd-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .cmd-card {
+    background: var(--bg1);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+
+  .cmd-card:hover { border-color: var(--border2); }
+
+  .cmd-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 20px;
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+
+  .cmd-name {
+    font-family: 'DM Mono', monospace;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--blue);
+    background: var(--blue-dim);
+    padding: 4px 12px;
+    border-radius: 6px;
+    border: 1px solid rgba(122,173,207,0.2);
+  }
+
+  .cmd-syntax {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--text3);
+  }
+
+  .cmd-badge {
+    margin-left: auto;
+    font-size: 10px;
+    color: var(--green);
+    background: var(--green-dim);
+    border: 1px solid rgba(108,191,138,0.2);
+    padding: 3px 10px;
+    border-radius: 20px;
+  }
+
+  .cmd-body {
+    padding: 20px;
+  }
+
+  .cmd-desc {
+    color: var(--text2);
+    font-size: 14px;
+    margin-bottom: 16px;
+    line-height: 1.6;
+  }
+
+  .cmd-options {
+    margin-bottom: 16px;
+  }
+
+  .cmd-options h4 {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 8px;
+  }
+
+  .option-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--bg3);
+    font-size: 13px;
+  }
+
+  .option-row:last-child { border: none; }
+
+  .option-flag {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--green);
+    min-width: 140px;
+    flex-shrink: 0;
+  }
+
+  .option-desc { color: var(--text2); line-height: 1.5; }
+
+  .example-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 8px;
+  }
+
+  /* ── TASK MODEL ── */
+  .task-model {
+    background: var(--bg1);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin: 20px 0;
+  }
+
+  .task-model-header {
+    padding: 12px 20px;
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--text3);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .task-model-header span { color: var(--yellow); }
+
+  .field-row {
+    display: grid;
+    grid-template-columns: 140px 80px 1fr;
+    gap: 16px;
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--bg3);
+    font-size: 13px;
+    align-items: center;
+  }
+
+  .field-row:last-child { border: none; }
+
+  .field-name {
+    font-family: 'DM Mono', monospace;
+    color: var(--blue);
+    font-size: 12px;
+  }
+
+  .field-type {
+    font-family: 'DM Mono', monospace;
+    color: var(--yellow);
+    font-size: 11px;
+  }
+
+  .field-desc { color: var(--text3); }
+
+  /* ── STORAGE ── */
+  .storage-block {
+    background: var(--bg1);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .storage-header {
+    padding: 12px 20px;
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--text3);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .storage-header .file-badge {
+    color: var(--yellow);
+    background: var(--yellow-dim);
+    border: 1px solid rgba(212,168,83,0.2);
+    padding: 2px 10px;
+    border-radius: 4px;
+    font-size: 11px;
+  }
+
+  /* ── CALLOUT ── */
+  .callout {
+    border-radius: 10px;
+    padding: 16px 20px;
+    display: flex;
+    gap: 14px;
+    margin: 20px 0;
+    border: 1px solid;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .callout-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+
+  .callout.info {
+    background: var(--blue-dim);
+    border-color: rgba(122,173,207,0.2);
+    color: var(--blue);
+  }
+
+  .callout.warning {
+    background: var(--yellow-dim);
+    border-color: rgba(212,168,83,0.2);
+    color: var(--yellow);
+  }
+
+  .callout.success {
+    background: var(--green-dim);
+    border-color: rgba(108,191,138,0.2);
+    color: var(--green);
+  }
+
+  .callout .callout-body { color: var(--text2); }
+  .callout .callout-body strong { color: var(--text); }
+
+  /* ── FLOW ── */
+  .flow {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    position: relative;
+  }
+
+  .flow::before {
+    content: '';
+    position: absolute;
+    left: 19px; top: 0; bottom: 0;
+    width: 1px;
+    background: var(--border);
+  }
+
+  .flow-step {
+    display: flex;
+    gap: 20px;
+    padding: 0 0 24px;
+    position: relative;
+  }
+
+  .flow-step:last-child { padding-bottom: 0; }
+
+  .flow-num {
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--accent);
+    flex-shrink: 0;
+    z-index: 1;
+  }
+
+  .flow-content { padding-top: 8px; }
+
+  .flow-content h4 {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  .flow-content p {
+    font-size: 13px;
+    color: var(--text3);
+    margin: 0;
+  }
+
+  /* ── PRIORITY ── */
+  .priority-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+    margin: 20px 0;
+  }
+
+  .prio-item {
+    background: var(--bg1);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 12px;
+    text-align: center;
+  }
+
+  .prio-num {
+    font-family: 'Instrument Serif', serif;
+    font-size: 28px;
+    font-weight: 400;
+    margin-bottom: 4px;
+  }
+
+  .prio-label {
+    font-size: 11px;
+    color: var(--text3);
+  }
+
+  .prio-1 { border-color: rgba(108,191,138,0.3); }
+  .prio-1 .prio-num { color: var(--green); }
+  .prio-2 { border-color: rgba(122,173,207,0.3); }
+  .prio-2 .prio-num { color: var(--blue); }
+  .prio-3 { border-color: rgba(212,168,83,0.3); }
+  .prio-3 .prio-num { color: var(--yellow); }
+  .prio-4 { border-color: rgba(204,120,92,0.3); }
+  .prio-4 .prio-num { color: var(--accent2); }
+  .prio-5 { border-color: rgba(201,100,100,0.3); }
+  .prio-5 .prio-num { color: var(--red); }
+
+  /* ── TIME FORMAT ── */
+  .time-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin: 16px 0;
+  }
+
+  .time-table th {
+    text-align: left;
+    padding: 10px 16px;
+    background: var(--bg2);
+    color: var(--text3);
+    font-weight: 500;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .time-table td {
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--bg3);
+    vertical-align: middle;
+  }
+
+  .time-table tr:last-child td { border: none; }
+  .time-table tr:hover td { background: var(--bg2); }
+
+  .time-table .mono {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--yellow);
+  }
+
+  .time-table td:last-child { color: var(--text3); }
+
+  /* ── FOOTER ── */
+  .footer {
+    margin-top: 80px;
+    padding: 40px 80px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .footer .footer-left { color: var(--text3); font-size: 13px; }
+  .footer .footer-left strong { color: var(--text2); }
+
+  .footer-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--text3);
+    background: var(--bg1);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 16px;
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .section { animation: fadeInUp 0.4s ease both; }
+  .section:nth-child(1) { animation-delay: 0.05s; }
+  .section:nth-child(2) { animation-delay: 0.1s; }
+  .section:nth-child(3) { animation-delay: 0.15s; }
+  .section:nth-child(4) { animation-delay: 0.2s; }
+  .section:nth-child(5) { animation-delay: 0.25s; }
+
+  /* ── INLINE CODE ── */
+  code.inline {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1px 6px;
+    color: var(--accent2);
+  }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sidebar-brand">
+    <div class="logo">
+      <div class="logo-icon">📋</div>
+      <h1>Tasks Manager</h1>
+    </div>
+    <span class="version">v1.1</span>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-label">Einstieg</div>
+    <a class="nav-link active" href="#overview">
+      <span class="nav-icon">◈</span> Übersicht
+    </a>
+    <a class="nav-link" href="#architecture">
+      <span class="nav-icon">◫</span> Architektur
+    </a>
+    <a class="nav-link" href="#start">
+      <span class="nav-icon">▷</span> Starten
+    </a>
+  </div>
+
+  <div class="nav-section" style="margin-top:8px">
+    <div class="nav-section-label">Befehle</div>
+    <a class="nav-link" href="#cmd-add">
+      <span class="nav-icon">+</span> add
+    </a>
+    <a class="nav-link" href="#cmd-list">
+      <span class="nav-icon">≡</span> list
+    </a>
+    <a class="nav-link" href="#cmd-remove">
+      <span class="nav-icon">×</span> remove
+    </a>
+    <a class="nav-link" href="#cmd-change">
+      <span class="nav-icon">✎</span> change
+    </a>
+    <a class="nav-link" href="#cmd-sort">
+      <span class="nav-icon">⇅</span> sort
+    </a>
+  </div>
+
+  <div class="nav-section" style="margin-top:8px">
+    <div class="nav-section-label">Konzepte</div>
+    <a class="nav-link" href="#task-model">
+      <span class="nav-icon">◻</span> Task-Modell
+    </a>
+    <a class="nav-link" href="#storage">
+      <span class="nav-icon">◑</span> Datenspeicherung
+    </a>
+    <a class="nav-link" href="#scheduler">
+      <span class="nav-icon">◷</span> Scheduler
+    </a>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-tag">
+      <span>●</span> Java CLI · v1.1
+    </div>
+    <h1>Tasks Manager<br><em>Dokumentation</em></h1>
+    <p class="subtitle">Ein Java-basierter Aufgaben-Scheduler mit CLI-Oberfläche. Erstelle, verwalte und plane Tasks — persistent gespeichert in JSON.</p>
+    <div class="hero-meta">
+      <div class="meta-item">
+        <span class="dot"></span>
+        <span>von Vladyslav Monke</span>
+      </div>
+      <div class="meta-item">·</div>
+      <div class="meta-item">Java 21+</div>
+      <div class="meta-item">·</div>
+      <div class="meta-item">Maven Build</div>
+      <div class="meta-item">·</div>
+      <div class="meta-item">tasks.json Persistenz</div>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- SECTION 1: OVERVIEW -->
+    <section class="section" id="overview">
+      <div class="section-header">
+        <div class="section-num">01</div>
+        <h2>Übersicht</h2>
+      </div>
+
+      <p>Tasks Manager ist ein Kommandozeilen-Tool, mit dem du Aufgaben erstellen, priorisieren und zeitgesteuert automatisch ausführen lassen kannst. Tasks werden in einer JSON-Datei gespeichert und beim nächsten Start wieder geladen.</p>
+
+      <div class="overview-grid">
+        <div class="overview-card">
+          <div class="card-icon">⏱</div>
+          <h3>Zeitgesteuerter Scheduler</h3>
+          <p>Tasks werden zum gewünschten Zeitpunkt automatisch ausgeführt — auch während das Programm läuft.</p>
+        </div>
+        <div class="overview-card">
+          <div class="card-icon">💾</div>
+          <h3>JSON-Persistenz</h3>
+          <p>Alle Tasks werden in <code class="inline">tasks.json</code> gespeichert und beim Neustart wiederhergestellt.</p>
+        </div>
+        <div class="overview-card">
+          <div class="card-icon">⚡</div>
+          <h3>Immutable Tasks</h3>
+          <p>Das Task-Objekt ist unveränderlich — Änderungen erzeugen stets eine neue Instanz (funktionales Design).</p>
+        </div>
+        <div class="overview-card">
+          <div class="card-icon">🔌</div>
+          <h3>Erweiterbar</h3>
+          <p>Das Command-Interface macht es einfach, neue Befehle zu registrieren und dem CLI hinzuzufügen.</p>
+        </div>
+      </div>
+
+      <div class="callout info">
+        <div class="callout-icon">ℹ</div>
+        <div class="callout-body">
+          <strong>Noch in Entwicklung:</strong> Einige Features wie <code class="inline">--ExecuteAt</code> ändern und die GUI-Oberfläche sind noch nicht vollständig implementiert.
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 2: ARCHITECTURE -->
+    <section class="section" id="architecture">
+      <div class="section-header">
+        <div class="section-num">02</div>
+        <h2>Architektur</h2>
+      </div>
+
+      <p>Das Projekt ist in vier klar getrennte Pakete aufgeteilt, die jeweils eine eigene Verantwortung tragen.</p>
+
+      <div class="arch-grid">
+        <div class="arch-pkg">
+          <div class="pkg-name">cli/</div>
+          <ul class="pkg-files">
+            <li>Main.java</li>
+            <li>Command.java</li>
+            <li>CommandRegistry.java</li>
+            <li>commands/AddCommand</li>
+            <li>commands/ListCommand</li>
+            <li>commands/RemoveCommand</li>
+            <li>commands/ChangeCommand</li>
+            <li>commands/SortCommand</li>
+          </ul>
+        </div>
+        <div class="arch-pkg">
+          <div class="pkg-name">core/</div>
+          <ul class="pkg-files">
+            <li>Task.java</li>
+            <li>Scheduler.java</li>
+            <li>RunnableActions/</li>
+            <li>RandomFact.java</li>
+            <li>SpaceFact.java</li>
+            <li>codingChallange.java</li>
+          </ul>
+        </div>
+        <div class="arch-pkg">
+          <div class="pkg-name">storage/ · gui/</div>
+          <ul class="pkg-files">
+            <li>Data.java</li>
+            <li>Gui.java</li>
+            <li>StartingScene.java</li>
+            <li>TasksScene.java</li>
+            <li>InformationScene.java</li>
+            <li>style.css</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="flow">
+        <div class="flow-step">
+          <div class="flow-num">1</div>
+          <div class="flow-content">
+            <h4>Start & Laden</h4>
+            <p><code class="inline">Main.java</code> startet — <code class="inline">Data.loadFile()</code> lädt alle Tasks aus <code class="inline">tasks.json</code> in den Scheduler.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">2</div>
+          <div class="flow-content">
+            <h4>Scheduler aktivieren</h4>
+            <p><code class="inline">scheduler.start()</code> plant alle geladenen Tasks sofort im <code class="inline">ScheduledExecutorService</code>.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">3</div>
+          <div class="flow-content">
+            <h4>CLI-Loop</h4>
+            <p>Der Nutzer gibt Befehle ein. <code class="inline">CommandRegistry</code> mappt das erste Wort auf die passende Implementierung.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">4</div>
+          <div class="flow-content">
+            <h4>Speichern & Beenden</h4>
+            <p>Bei <code class="inline">exit</code> wird <code class="inline">Data.saveFile()</code> aufgerufen und der Scheduler ordentlich beendet.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 3: START -->
+    <section class="section" id="start">
+      <div class="section-header">
+        <div class="section-num">03</div>
+        <h2>Starten</h2>
+      </div>
+
+      <p>Voraussetzung: Java 21+ und Maven müssen installiert sein. Klone das Repository und baue das Projekt:</p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <div class="code-lang">🖥 Terminal</div>
+          <div class="code-label">Build &amp; Run</div>
+        </div>
+        <div class="code-body">
+<code><span class="c-comment"># Projekt bauen</span>
+<span class="c-prompt">$</span> <span class="c-cmd">mvn</span> <span class="c-arg">package</span>
+
+<span class="c-comment"># Starten</span>
+<span class="c-prompt">$</span> <span class="c-cmd">java</span> <span class="c-flag">-cp</span> <span class="c-arg">target/classes</span> <span class="c-class">cli.Main</span>
+
+<span class="c-comment"># Alternativ mit IDE (IntelliJ)</span>
+<span class="c-comment"># → Main.java öffnen → Run</span>
+
+<span class="c-output">> </span><span class="c-comment">Eingabe-Prompt erscheint</span></code>
+        </div>
+      </div>
+
+      <div class="callout warning">
+        <div class="callout-icon">⚠</div>
+        <div class="callout-body">
+          <strong>Working Directory:</strong> Die <code class="inline">tasks.json</code> wird im Verzeichnis erstellt, von dem aus du das Programm startest. Starte das Programm immer aus demselben Ordner, damit die Tasks geladen werden.
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION: COMMANDS -->
+    <section class="section" id="cmd-add">
+      <div class="section-header">
+        <div class="section-num">04</div>
+        <h2>Befehle</h2>
+      </div>
+
+      <div class="cmd-list">
+
+        <!-- ADD -->
+        <div class="cmd-card" id="cmd-add">
+          <div class="cmd-header">
+            <div class="cmd-name">add</div>
+            <div class="cmd-syntax">add --&lt;name&gt; -- &lt;priorität&gt; -- &lt;zeit&gt;</div>
+            <div class="cmd-badge">✓ stabil</div>
+          </div>
+          <div class="cmd-body">
+            <div class="cmd-desc">Fügt eine neue Aufgabe hinzu und plant sie sofort im Scheduler. Nach dem Hinzufügen wird automatisch gespeichert.</div>
+            <div class="cmd-options">
+              <h4>Zeitformate</h4>
+              <div class="option-row">
+                <div class="option-flag">&lt;zahl&gt;s</div>
+                <div class="option-desc">In X Sekunden ausführen</div>
+              </div>
+              <div class="option-row">
+                <div class="option-flag">&lt;zahl&gt;min</div>
+                <div class="option-desc">In X Minuten ausführen</div>
+              </div>
+              <div class="option-row">
+                <div class="option-flag">&lt;zahl&gt;h</div>
+                <div class="option-desc">In X Stunden ausführen</div>
+              </div>
+            </div>
+            <div class="example-label">Beispiele</div>
+            <div class="code-block">
+              <div class="code-header">
+                <div class="code-lang">🖥 CLI</div>
+              </div>
+              <div class="code-body">
+<code><span class="c-comment"># Task "Meeting vorbereiten" mit Priorität 2 in 30 Minuten</span>
+<span class="c-prompt">></span> <span class="c-cmd">add</span> <span class="c-flag">--</span><span class="c-arg">Meeting vorbereiten</span> <span class="c-flag">--</span> <span class="c-arg">2</span> <span class="c-flag">--</span> <span class="c-arg">30min</span>
+
+<span class="c-comment"># Task "Backup" mit höchster Priorität in 2 Stunden</span>
+<span class="c-prompt">></span> <span class="c-cmd">add</span> <span class="c-flag">--</span><span class="c-arg">Backup</span> <span class="c-flag">--</span> <span class="c-arg">5</span> <span class="c-flag">--</span> <span class="c-arg">2h</span>
+
+<span class="c-comment"># Task sofort (in 10 Sekunden)</span>
+<span class="c-prompt">></span> <span class="c-cmd">add</span> <span class="c-flag">--</span><span class="c-arg">Testlauf</span> <span class="c-flag">--</span> <span class="c-arg">1</span> <span class="c-flag">--</span> <span class="c-arg">10s</span></code>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- LIST -->
+        <div class="cmd-card" id="cmd-list">
+          <div class="cmd-header">
+            <div class="cmd-name">list</div>
+            <div class="cmd-syntax">list</div>
+            <div class="cmd-badge">✓ stabil</div>
+          </div>
+          <div class="cmd-body">
+            <div class="cmd-desc">Gibt alle aktiven Tasks aus — mit UUID, Name, Priorität und geplantem Ausführungszeitpunkt in lokaler Zeitzone.</div>
+            <div class="example-label">Ausgabe-Beispiel</div>
+            <div class="code-block">
+              <div class="code-header">
+                <div class="code-lang">🖥 CLI</div>
+              </div>
+              <div class="code-body">
+<code><span class="c-prompt">></span> <span class="c-cmd">list</span>
+
+<span class="c-output">ID : 3f2e1a4b-c9d8-4e7f-a1b2-0c3d4e5f6a7b</span>
+<span class="c-output">Name : Meeting vorbereiten</span>
+<span class="c-output">Priority : 2</span>
+<span class="c-output">Execution: 2025-06-10T14:30:00+02:00[Europe/Vienna]</span>
+
+<span class="c-output">ID : 8a7b6c5d-4e3f-2a1b-0c9d-8e7f6a5b4c3d</span>
+<span class="c-output">Name : Backup</span>
+<span class="c-output">Priority : 5</span>
+<span class="c-output">Execution: 2025-06-10T16:00:00+02:00[Europe/Vienna]</span></code>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- REMOVE -->
+        <div class="cmd-card" id="cmd-remove">
+          <div class="cmd-header">
+            <div class="cmd-name">remove</div>
+            <div class="cmd-syntax">remove --&lt;methode&gt; &lt;wert&gt;</div>
+            <div class="cmd-badge">✓ stabil</div>
+          </div>
+          <div class="cmd-body">
+            <div class="cmd-desc">Entfernt Tasks aus dem Scheduler und bricht deren geplante Ausführung ab. Danach wird automatisch gespeichert.</div>
+            <div class="cmd-options">
+              <h4>Optionen</h4>
+              <div class="option-row">
+                <div class="option-flag">--byName</div>
+                <div class="option-desc">Entfernt alle Tasks mit diesem Namen (Groß-/Kleinschreibung beachten)</div>
+              </div>
+              <div class="option-row">
+                <div class="option-flag">--byPriority</div>
+                <div class="option-desc">Entfernt alle Tasks mit der angegebenen Priorität (1–5)</div>
+              </div>
+              <div class="option-row">
+                <div class="option-flag">--byUUID</div>
+                <div class="option-desc">Entfernt genau den Task mit dieser UUID (präziseste Methode)</div>
+              </div>
+            </div>
+            <div class="example-label">Beispiele</div>
+            <div class="code-block">
+              <div class="code-header">
+                <div class="code-lang">🖥 CLI</div>
+              </div>
+              <div class="code-body">
+<code><span class="c-prompt">></span> <span class="c-cmd">remove</span> <span class="c-flag">--byName</span> <span class="c-arg">Backup</span>
+
+<span class="c-prompt">></span> <span class="c-cmd">remove</span> <span class="c-flag">--byPriority</span> <span class="c-arg">1</span>
+
+<span class="c-prompt">></span> <span class="c-cmd">remove</span> <span class="c-flag">--byUUID</span> <span class="c-arg">3f2e1a4b-c9d8-4e7f-a1b2-0c3d4e5f6a7b</span></code>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CHANGE -->
+        <div class="cmd-card" id="cmd-change">
+          <div class="cmd-header">
+            <div class="cmd-name">change</div>
+            <div class="cmd-syntax">change --&lt;feld&gt; &lt;uuid&gt; &lt;wert&gt;</div>
+            <div class="cmd-badge">✓ stabil</div>
+          </div>
+          <div class="cmd-body">
+            <div class="cmd-desc">Ändert Name oder Priorität eines Tasks anhand seiner UUID. Der alte Task wird ersetzt — der Scheduler plant den geänderten Task neu.</div>
+            <div class="cmd-options">
+              <h4>Optionen</h4>
+              <div class="option-row">
+                <div class="option-flag">--Name</div>
+                <div class="option-desc">Setzt einen neuen Namen für den Task</div>
+              </div>
+              <div class="option-row">
+                <div class="option-flag">--Priority</div>
+                <div class="option-desc">Setzt eine neue Priorität (1–5)</div>
+              </div>
+              <div class="option-row">
+                <div class="option-flag">--ExecuteAt</div>
+                <div class="option-desc" style="color:var(--text3)"><em>Noch nicht implementiert (TODO)</em></div>
+              </div>
+            </div>
+            <div class="example-label">Beispiele</div>
+            <div class="code-block">
+              <div class="code-header">
+                <div class="code-lang">🖥 CLI</div>
+              </div>
+              <div class="code-body">
+<code><span class="c-comment"># Name ändern</span>
+<span class="c-prompt">></span> <span class="c-cmd">change</span> <span class="c-flag">--Name</span> <span class="c-arg">3f2e1a4b-c9d8-4e7f-a1b2-0c3d4e5f6a7b</span> <span class="c-arg">Notfall-Backup</span>
+
+<span class="c-comment"># Priorität auf 5 setzen</span>
+<span class="c-prompt">></span> <span class="c-cmd">change</span> <span class="c-flag">--Priority</span> <span class="c-arg">3f2e1a4b-c9d8-4e7f-a1b2-0c3d4e5f6a7b</span> <span class="c-arg">5</span></code>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SORT -->
+        <div class="cmd-card" id="cmd-sort">
+          <div class="cmd-header">
+            <div class="cmd-name">sort</div>
+            <div class="cmd-syntax">sort --&lt;methode&gt;</div>
+            <div class="cmd-badge">✓ stabil</div>
+          </div>
+          <div class="cmd-body">
+            <div class="cmd-desc">Sortiert die interne Task-Liste und speichert die neue Reihenfolge in der JSON-Datei. Beeinflusst die Ausgabe von <code class="inline">list</code>.</div>
+            <div class="cmd-options">
+              <h4>Optionen</h4>
+              <div class="option-row">
+                <div class="option-flag">--byName</div>
+                <div class="option-desc">Alphabetisch nach Name (A → Z)</div>
+              </div>
+              <div class="option-row">
+                <div class="option-flag">--byPriority</div>
+                <div class="option-desc">Aufsteigend nach Priorität (1 → 5)</div>
+              </div>
+              <div class="option-row">
+                <div class="option-flag">--byTime</div>
+                <div class="option-desc">Chronologisch nach Ausführungszeit (früheste zuerst)</div>
+              </div>
+            </div>
+            <div class="example-label">Beispiele</div>
+            <div class="code-block">
+              <div class="code-header">
+                <div class="code-lang">🖥 CLI</div>
+              </div>
+              <div class="code-body">
+<code><span class="c-prompt">></span> <span class="c-cmd">sort</span> <span class="c-flag">--byPriority</span>
+<span class="c-prompt">></span> <span class="c-cmd">sort</span> <span class="c-flag">--byTime</span>
+<span class="c-prompt">></span> <span class="c-cmd">sort</span> <span class="c-flag">--byName</span></code>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /cmd-list -->
+
+      <div class="code-block" style="margin-top:24px">
+        <div class="code-header">
+          <div class="code-lang">🖥 CLI</div>
+          <div class="code-label">Programm beenden</div>
+        </div>
+        <div class="code-body">
+<code><span class="c-prompt">></span> <span class="c-cmd">exit</span>
+<span class="c-comment"># Speichert tasks.json und beendet den Scheduler sauber</span></code>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION: TASK-MODELL -->
+    <section class="section" id="task-model">
+      <div class="section-header">
+        <div class="section-num">05</div>
+        <h2>Task-Modell</h2>
+      </div>
+
+      <p>Ein <code class="inline">Task</code> ist ein immutables Java-Objekt. Es hat vier Felder, und jede Änderung erzeugt eine neue Instanz über Wither-Methoden.</p>
+
+      <div class="task-model">
+        <div class="task-model-header">
+          <span>core.Task</span> — Felder
+        </div>
+        <div class="field-row">
+          <div class="field-name">id</div>
+          <div class="field-type">UUID</div>
+          <div class="field-desc">Eindeutige Kennung, automatisch generiert</div>
+        </div>
+        <div class="field-row">
+          <div class="field-name">name</div>
+          <div class="field-type">String</div>
+          <div class="field-desc">Bezeichnung der Aufgabe (nicht null)</div>
+        </div>
+        <div class="field-row">
+          <div class="field-name">priority</div>
+          <div class="field-type">int</div>
+          <div class="field-desc">Priorität von 1 (niedrig) bis 5 (kritisch)</div>
+        </div>
+        <div class="field-row">
+          <div class="field-name">executeAt</div>
+          <div class="field-type">Instant</div>
+          <div class="field-desc">Geplanter Ausführungszeitpunkt (UTC)</div>
+        </div>
+      </div>
+
+      <h3 style="font-size:15px;font-weight:600;margin:24px 0 12px;color:var(--text2)">Prioritätsstufen</h3>
+
+      <div class="priority-grid">
+        <div class="prio-item prio-1">
+          <div class="prio-num">1</div>
+          <div class="prio-label">Niedrig</div>
+        </div>
+        <div class="prio-item prio-2">
+          <div class="prio-num">2</div>
+          <div class="prio-label">Normal</div>
+        </div>
+        <div class="prio-item prio-3">
+          <div class="prio-num">3</div>
+          <div class="prio-label">Mittel</div>
+        </div>
+        <div class="prio-item prio-4">
+          <div class="prio-num">4</div>
+          <div class="prio-label">Hoch</div>
+        </div>
+        <div class="prio-item prio-5">
+          <div class="prio-num">5</div>
+          <div class="prio-label">Kritisch</div>
+        </div>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header">
+          <div class="code-lang">☕ Java</div>
+          <div class="code-label">Immutable Pattern</div>
+        </div>
+        <div class="code-body">
+<code><span class="c-comment">// Task erstellen</span>
+<span class="c-class">Task</span> t = <span class="c-keyword">new</span> <span class="c-class">Task</span>(<span class="c-string">"Backup"</span>, <span class="c-num">5</span>, Instant.now().plusSeconds(<span class="c-num">3600</span>));
+
+<span class="c-comment">// Name ändern → neue Instanz, original unverändert</span>
+<span class="c-class">Task</span> t2 = t.withName(<span class="c-string">"Notfall-Backup"</span>);
+
+<span class="c-comment">// Priorität ändern → wieder neue Instanz</span>
+<span class="c-class">Task</span> t3 = t2.withPriority(<span class="c-num">3</span>);</code>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION: STORAGE -->
+    <section class="section" id="storage">
+      <div class="section-header">
+        <div class="section-num">06</div>
+        <h2>Datenspeicherung</h2>
+      </div>
+
+      <p>Alle Tasks werden in einer Datei namens <code class="inline">tasks.json</code> im Arbeitsverzeichnis gespeichert. Das Format ist manuell lesbares JSON.</p>
+
+      <div class="storage-block">
+        <div class="storage-header">
+          <span>Dateiformat</span>
+          <span class="file-badge">tasks.json</span>
+        </div>
+        <div class="code-body">
+<code style="font-family:'DM Mono',monospace;font-size:13px;line-height:1.8;display:block;padding:20px">
+<span style="color:var(--border2)">{</span>
+  <span style="color:#7aadcf">"3f2e1a4b-c9d8-4e7f-a1b2-0c3d4e5f6a7b"</span>: <span style="color:var(--border2)">{</span>
+    <span style="color:#7aadcf">"name"</span>: <span style="color:var(--green)">"Meeting vorbereiten"</span>,
+    <span style="color:#7aadcf">"priority"</span>: <span style="color:var(--accent2)">2</span>,
+    <span style="color:#7aadcf">"executeAt"</span>: <span style="color:var(--green)">"2025-06-10T12:30:00Z"</span>
+  <span style="color:var(--border2)">}</span>,
+  <span style="color:#7aadcf">"8a7b6c5d-4e3f-2a1b-0c9d-8e7f6a5b4c3d"</span>: <span style="color:var(--border2)">{</span>
+    <span style="color:#7aadcf">"name"</span>: <span style="color:var(--green)">"Backup"</span>,
+    <span style="color:#7aadcf">"priority"</span>: <span style="color:var(--accent2)">5</span>,
+    <span style="color:#7aadcf">"executeAt"</span>: <span style="color:var(--green)">"2025-06-10T14:00:00Z"</span>
+  <span style="color:var(--border2)">}</span>
+<span style="color:var(--border2)">}</span></code>
+        </div>
+      </div>
+
+      <div class="callout success">
+        <div class="callout-icon">✓</div>
+        <div class="callout-body">
+          Die Datei wird nach jedem <code class="inline">add</code>, <code class="inline">remove</code>, <code class="inline">sort</code> und beim <code class="inline">exit</code> automatisch aktualisiert. Kein manuelles Speichern nötig.
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION: SCHEDULER -->
+    <section class="section" id="scheduler">
+      <div class="section-header">
+        <div class="section-num">07</div>
+        <h2>Scheduler</h2>
+      </div>
+
+      <p>Der Scheduler nutzt Javas <code class="inline">ScheduledExecutorService</code> mit einem Single-Thread-Pool. Er plant jeden Task individuell und löscht ihn nach der Ausführung automatisch.</p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <div class="code-lang">☕ Java</div>
+          <div class="code-label">Interne Ausführung</div>
+        </div>
+        <div class="code-body">
+<code><span class="c-comment">// Was passiert, wenn ein Task ausgeführt wird:</span>
+executor.schedule(() -> {
+    <span class="c-keyword">try</span> {
+        System.out.println(<span class="c-string">"\nEXEC "</span> + task.getName());
+        <span class="c-comment">// → hier könnte eine Runnable-Action laufen (TODO)</span>
+    } <span class="c-keyword">finally</span> {
+        scheduled.remove(task.getId());
+        remove(task.getId()); <span class="c-comment">// aus der Liste entfernen</span>
+    }
+}, delay, TimeUnit.MILLISECONDS);</code>
+        </div>
+      </div>
+
+      <div class="callout info">
+        <div class="callout-icon">ℹ</div>
+        <div class="callout-body">
+          <strong>RunnableActions:</strong> Im Ordner <code class="inline">core/RunnableActions/</code> sind bereits Ideen angelegt — z.B. <code class="inline">RandomFact</code>, <code class="inline">SpaceFact</code> und <code class="inline">codingChallange</code>. Diese sollen zukünftig als echte Aktionen an Tasks gebunden werden können.
+        </div>
+      </div>
+
+      <h3 style="font-size:15px;font-weight:600;margin:24px 0 12px;color:var(--text2)">Thread-Sicherheit</h3>
+      <p>Alle Zugriffe auf die Task-Liste und die Scheduled-Map sind mit <code class="inline">synchronized</code> geschützt. Das <code class="inline">snapshot()</code>-Muster verhindert ConcurrentModificationException beim Iterieren.</p>
+    </section>
+
+  </div><!-- /content -->
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <div class="footer-left">
+      <strong>Tasks Manager</strong> · Dokumentation · v1.1<br>
+      <span style="font-size:12px">Autor: Vladyslav Monke</span>
+    </div>
+    <div class="footer-badge">
+      <span>☕</span> Java · Maven · JSON
+    </div>
+  </div>
+
+</main>
+
+<script>
+  // Highlight active nav link on scroll
+  var sections = document.querySelectorAll('section[id], div[id]');
+  var navLinks = document.querySelectorAll('.nav-link');
+
+  function updateActive() {
+    var scrollY = window.scrollY + 60;
+    var current = '';
+    sections.forEach(function(s) {
+      if (s.offsetTop <= scrollY) current = s.id;
+    });
+    navLinks.forEach(function(link) {
+      link.classList.remove('active');
+      if (link.getAttribute('href') === '#' + current) {
+        link.classList.add('active');
+      }
+    });
+  }
+
+  window.addEventListener('scroll', updateActive);
+  updateActive();
+</script>
+
+</body>
+</html>
